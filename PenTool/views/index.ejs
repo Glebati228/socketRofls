@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pen Tool</title>
+        <meta charset="UTF-8"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    </head>
+    <body>
+        <h2>
+            Pen Tool
+        </h2>
+        <input type="text" class="username">
+        <button value="username" class = "send_username" type="submit"></button>
+        
+        <h1 id="userfield"></h1>
+
+        <div class="textfield"></div>
+
+        <input type="text" class="message">
+        <button type="submit" class="send_message">
+
+        <script type="text/javascript">
+            $(function()
+            {
+                var socket = io();
+
+                var username = $(".username");
+                var send_username = $(".send_username");
+                var userfield = $("#userfield");
+                var textfield = $(".textfield");
+                var message = $(".message");
+                var send_message = $(".send_message");
+
+                send_username.click(function()
+                {
+                    userfield.text("Вы: " + username.val());
+                    socket.emit("change_username", {username : username.val()})
+                });
+
+                socket.on("userConnected", function(data)
+                {
+                    textfield.append("<p> Подключился новый пользователь: " + data.name + "</p>");
+                });
+
+                socket.on("changedName", function(data)
+                {
+                    textfield.append("<b> Пользователь " + data.oldName + " меняет имя на: " + data.newName + "</b>" + "<br/>");
+                });
+
+                socket.on("sended_text", function(data)
+                {
+                    textfield.append("<p>" + data.name + ": " + data.text + "</p>");
+                    textfield.append("<br/>"); 
+                });
+
+                send_message.click(function(data)
+                {
+                   //textfield.append("<p>" + textfield.val() + "</p>");
+                   //textfield.append("<br/>"); 
+                   socket.emit("send_text", {text : message.val()});
+                });
+            })
+        </script/>
+    </body>
+</html>
